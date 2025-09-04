@@ -1,3 +1,9 @@
+# 2025 Red Hat TAM Day @Taiwan
+
+## 打造零中斷維運能力：RHEL 結合 AI 與 MCP 實戰解密 實機工作坊
+
+
+
 ## Workshop 環境說明
 
 您的位子上會有一張A4的workshop環境說明書，載明了您的報到編號，以及連線時所需資訊。
