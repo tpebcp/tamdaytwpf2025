@@ -12,7 +12,7 @@
 2. AAP圖形化界面，及其帳號、密碼
 3. Git Server (Gitea)的圖形化界面，及其帳號、密碼
 
-各服務的帳號雖然不同，但都使用<u>相同的密碼</u>。
+各服務的帳號雖然不同，但都使用<u>相同的密碼</u>。所有的帳號、密碼都
 
 其他資訊(比方說網路版的VS Code)在我們platform lab不是個必備的工具。但您可以使用瀏覽器連線到VS Code網路版，在VS Code的terminal裏進行操作。或直接使用ssh連線到bastion主機進行操作。
 
@@ -97,7 +97,11 @@ org ID: 6265347
 | ５      | 看完信後，以AI工具進行調查           | 否，但滿實用，而且也應該是未來的工作主流                 | 5              |
 | 6       | 以AI工具對Ansible Controller進行操作 | 否，但很建議試做，因為這樣的組合目前在網際網路上還很少見 | 5              |
 
-
+> [!tip]
+>
+> 如果做lab遇到問題，怎麼辦?
+>
+> 請您舉手，我們隨侍在側的TAM同仁會前來幫忙。
 
 ## Lab 1：建置Event-driven的環境
 
@@ -139,7 +143,7 @@ Ansible Rulebook就像Ansible Playbook一樣，是個yaml檔案。但它和playb
 
 ### 檢查Event-Driven Ansible目前現況
 
-1. 請使用您筆電的瀏覽器，登入AAP的圖形化界面。
+1. 請使用您筆電的瀏覽器，登入AAP的圖形化界面，<u>使用的帳號是admin</u>。
 
 2. 在左手邊的功能欄中，有一區為Automation Decisions，這就是Event-driven Ansible的設定區域。
 
@@ -253,7 +257,7 @@ platform-eda     platform-eda-aap.apps.cluster-p8fxl.p8fxl.sandbox5183.opentlc.c
 5. abort
 6. outOfMemory
 7. timeIsNotSync
-請輸入1-7?輸入後程式會在/var/log/messages插入測試個案的關鍵字。 1
+請輸入對應編號?輸入後程式會在/var/log/messages插入測試個案的關鍵字。 1
 目前時間：20250903011345
 選擇測試個案：blocked for more than 120
 應為第一次執行，mtail沒有找到blocked for more than 120之前出現的記錄
@@ -410,14 +414,14 @@ named[1514]: exiting (due to assertion failure)
 /(?i)\b(lockup|blocked for more than 120|segfault|abort|mcelog|invoked oom-killer|no majority)\b/ {
 ```
 
-在no majority之後加入新的關鍵字
+在no majority之後加入一個'|'以及新的關鍵字'failed, back trace'
 
 ```pseudocode
 # 正規表示式匹配keyword - 要加keyword要改下面這行
-/(?i)(lockup|blocked for more than 120|segfault|abort|mcelog|invoked oom-killer|no majority|failed, back trace)/ {
+/(?i)\b(lockup|blocked for more than 120|segfault|abort|mcelog|invoked oom-killer|no majority|failed, back trace)\b/ {
 ```
 
-重啟mtail服務，簡單的透過mtail web界面做健檢：
+重啟mtail服務，簡單的透過mtail web界面做健檢-超重要：
 ```pseudocode
 [lab-user@bastion tamday]$ sudo systemctl restart mtail
 [lab-user@bastion tamday]$ curl -sk localhost:3903 | grep 'No compile errors'
@@ -560,17 +564,7 @@ To https://gitea.apps.cluster-p8fxl.p8fxl.sandbox5183.opentlc.com/dev-admin/pf_p
    8cef593..fda9e13  main -> main
 ```
 
-### 步驟四：在Ansible Controller執行一次Project的更新
-
-雖然Git server已經接受我們的新檔案，但Ansible Controller預設不會自動去Git Server下載新的playbook。
-
-若此時我們在Ansible Controller透過Job Template執行ask-light-speed-review-logs.yml，會執行到舊的版本。
-
-因此，我們現在要登入Ansible Controller，執行一次Project Sync。
-
-<img src="eda8.png" style="zoom:50%;" />
-
-### 步驟五：進行測試
+### 步驟四：進行測試
 
 讓我們在Bastion主機驗證結果吧!
 
@@ -585,7 +579,7 @@ To https://gitea.apps.cluster-p8fxl.p8fxl.sandbox5183.opentlc.com/dev-admin/pf_p
 6. outOfMemory
 7. timeIsNotSync
 8. failedBackTrace　　<---　我們新加的測試個案
-請輸入1-7?輸入後程式會在/var/log/messages插入測試個案的關鍵字。 8　　　<---　輸入８
+請輸入對應編號?輸入後程式會在/var/log/messages插入測試個案的關鍵字。 8　　　<---　輸入８
 ```
 
 再等待3-5分鐘，執行mail指令，即可收到告警信及其AI分析結果二封。
@@ -619,20 +613,34 @@ To https://gitea.apps.cluster-p8fxl.p8fxl.sandbox5183.opentlc.com/dev-admin/pf_p
 ![](aap2.png)
 
 1. 在Ansible Execution區塊點選Templates
+
 2. 決定一個名字、您可以隨便取
+
 3. Job Template的運行模式：請確定為Run
+
 4. 選定Inventory。在這個workshop您得選"bastion"。
+
 5. 選定playbook存放的來源。在這個workshop您得選"local gitea"。
+
 6. 選定playbook：我們已經幫您準備好了，這個會以LINE API的方式傳送事故資料的playbook叫做「notifyLine.yml」。
    它已在事前同步在Git server，並同步至Ansible Controller了。
+
 7. 選定Credential：由於notifyLine.yml裏面會使用LINE API的token，而這項機密資料是放在Git server的pf_playbook子目錄下的secret.yml加密檔案，在notifyLine.yml執行時會讀取。
    讀取時要解密secret.yml，因此我們要提供一個credential物件，型式是"Vault"，裏面內藏著能解開secret.yml的密碼。
+
 8. 啟用Prompt on launch
    這個功能平常是讓playbook執行時，能讓人類在啟用時隨機更換變數內容。
    但在API呼叫時，這個功能會讓API更換變數內容。藉此，我們可以「接收」EDA傳送來的值，用來正確的表述出問題的主機名稱及事故代號。
+
 9. 能接受臨時更改的變數清單
-   這裏只有target and keyword二個變數能接受新傳進來的值，分別代表出問題的主機名稱及事故代號。
-   這也會是送到LINE上面的基本訊息。
+   這裏只有target and keyword二個變數能接受新傳進來的值，分別代表出問題的主機名稱及事故代號。在本次測試時，請參考上面的截圖，輸入
+
+   ```yaml
+   target: test-server
+   keyword: test-keyword
+   ```
+
+   這也會是送到LINE上面的基本訊息。也歡迎您輸入其他有鑑別性質的資訊，比方說`target: AAA-Company`，`keyword: hellokitty`，但必須是yaml格式。
 
 最後按下底下的「Create job template」完成建置。
 
@@ -660,7 +668,7 @@ To https://gitea.apps.cluster-p8fxl.p8fxl.sandbox5183.opentlc.com/dev-admin/pf_p
 
 <img src="aap6.png" style="zoom:50%;" />
 
-最後成果會像下圖所示。**並請按下左上角的「Save」按鍵完成儲存!這個動作非常容易忘記，請小心!!!**
+最後成果會像下圖所示。**<u>並請按下左上角的「Save」按鍵完成儲存!這個動作非常容易忘記，請小心!!!</u>**
 
 ![](aap7.png)
 
