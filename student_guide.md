@@ -175,11 +175,12 @@ Ansible Rulebook就像Ansible Playbook一樣，是個yaml檔案。但它和playb
 
 請填入或檢視下列六個設定：
 
-1) rulebook名稱：請一定、一定、一定要填這個名字，**platform-eda**。
+1) rulebook名稱：<span style=color:red>請一定、一定、一定要填這個名字，**platform-eda**。</span>
    因為在Ansible on OCP環境，我們稍後要開設一個route物件，把這個rulebook產生的service物件對外公開。我們會提供一個yaml file建置這個route物件，而這個yaml檔案我們已經寫死了platform-eda這名字，為此請一定要填這個名字。
 
-   在您公司裏的環境，就可以和OCP管理員討論這方面的設定。若是您的AAP建置在RHEL環境，則取什麼rulebook名字就沒那麼重要，方便識別即可。
-
+   <span style=color:orange>若在您公司裏的環境，就可以和OCP管理員討論這方面的設定。若您是OCP專家，也可以在稍後的步驟建OCP route物件時，對應這裏設定做名稱更換</span>。
+   若是您的AAP建置在RHEL環境，則取什麼rulebook名字就沒那麼重要，方便管理員識別即可。
+   
 2) Organization設為Default即可。這設定只是做access control的管理-誰可以看或更動這裏的設定。
 
 3) Project：能從那裏取得rulebook? 在workshop環境我們使用Local Gitea project來取得。
@@ -479,7 +480,7 @@ esac
 
 我們要更動「人類的分析」這一塊，讓下次同仁收到告警的mail時，可以看到AI及「同仁加註的經驗談」。
 
-首先我們要把playbook同步到bastion主機-請注意下面範例的git server的名稱要更改：
+首先我們要把playbook同步到bastion主機-<span style=color:red><u>請注意下面範例的git server的名稱要更改</u>：</span>
 
 ```pseudocode
 [lab-user@bastion ~]$ cd tamday/
@@ -550,7 +551,7 @@ After doing this, you may fix the identity used for this commit with:
     git commit --amend --reset-author
 
  1 file changed, 6 insertions(+), 1 deletion(-)
-[lab-user@bastion pf_playbook]$ git commit -m ^Cdd a new keyword back trace for named issue'
+
 [lab-user@bastion pf_playbook]$ git push
 Username for 'https://gitea.apps.cluster-p8fxl.p8fxl.sandbox5183.opentlc.com': dev-admin
 Password for 'https://dev-admin@gitea.apps.cluster-p8fxl.p8fxl.sandbox5183.opentlc.com':
