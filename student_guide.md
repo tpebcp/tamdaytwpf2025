@@ -398,8 +398,8 @@ named[1514]: exiting (due to assertion failure)
 請在bastion主機，執行下述指令：
 
 ```pseudocode
-[lab-user@bastion progs]$ sudo cp /opt/mtail/progs/rsyslog.mtail /opt/mtail/progs/rsyslog.mtail.backup09092025
-[lab-user@bastion progs]$ sudo vi /opt/mtail/progs/rsyslog.mtail
+[lab-user@bastion tamday]$ sudo cp /opt/mtail/progs/rsyslog.mtail /opt/mtail/progs/rsyslog.mtail.backup09092025
+[lab-user@bastion tamday]$ sudo vi /opt/mtail/progs/rsyslog.mtail
 ```
 
 在設定檔的內容裏，找到下面的敘述
@@ -418,8 +418,8 @@ named[1514]: exiting (due to assertion failure)
 
 重啟mtail服務，簡單的透過mtail web界面做健檢：
 ```pseudocode
-[lab-user@bastion progs]$ sudo systemctl restart mtail
-[lab-user@bastion progs]$ curl -sk localhost:3903 | grep 'No compile errors'
+[lab-user@bastion tamday]$ sudo systemctl restart mtail
+[lab-user@bastion tamday]$ curl -sk localhost:3903 | grep 'No compile errors'
 No compile errors
 ```
 
@@ -428,13 +428,13 @@ No compile errors
 新建一個樣本測試檔案event.backtrace於~/tamday目錄下，內容如下所示：
 
 ```pseudocode
-[lab-user@bastion ~]$ cat ~/tamday/event.backtrace
+[lab-user@bastion tamday]$ cat ~/tamday/event.backtrace
 __builtin_expect((((const isc__magic_t *)(name->buffer))->magic == (0x42756621U)), 1)))) failed, back trace
 ```
 
 修改測試的script，方便我們持續測試
 ```pseudocode
-[lab-user@bastion ~]$ sudo vi /usr/local/bin/pfworkshop
+[lab-user@bastion tamday]$ sudo vi /usr/local/bin/pfworkshop
 ```
 
 改動一：新增選項`８. failedBackTrace`
