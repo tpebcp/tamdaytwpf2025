@@ -6,13 +6,13 @@
 
 ## Workshop 環境說明
 
-您的位子上會有一張A4的workshop環境說明書，載明了您的報到編號，以及連線時所需資訊。
-
-在platform lab所需的資訊有：
+這個workshop於雲端打造，您會需要存取下列服務來完成今天的練習。
 
 1. Bastion主機，及其帳號、密碼
 2. AAP圖形化界面，及其帳號、密碼
 3. Git Server (Gitea)的圖形化界面，及其帳號、密碼
+
+各服務的帳號雖然不同，但都使用<u>相同的密碼</u>。
 
 其他資訊(比方說網路版的VS Code)在我們platform lab不是個必備的工具。但您可以使用瀏覽器連線到VS Code網路版，在VS Code的terminal裏進行操作。或直接使用ssh連線到bastion主機進行操作。
 
@@ -44,8 +44,7 @@ $ podman kube play --down ~/.config/containers/ansible-kubernetes.d/prometheus.y
 ```
 ## 暖身運動：測試RHEL LightSpeed AI小幫手
 
-執行下列指令，測試RHEL LightSpeed是否能與我們交談。
-執行範例：
+執行下列指令，測試RHEL LightSpeed是否能與我們交談。而Lightspeed的執行檔是`/usr/bin/c`。請看執行範例：
 
 ```pseudocode
 [lab-user@bastion tamday]$ c '應使用什麼指令，調查目前檔案系統的使用狀況?'
@@ -53,7 +52,7 @@ $ podman kube play --down ~/.config/containers/ansible-kubernetes.d/prometheus.y
 (以下略)
 ```
 
-(您會發現Lightspeed的回覆不夠新…但這也是現實狀況，請您包涵。)
+(您會發現Lightspeed的回覆不夠新…但這也是AI現實狀況，請您包涵。)
 
 再接著讓 Lightspeed幫我們分析一段系統訊息
 
@@ -67,7 +66,9 @@ $ podman kube play --down ~/.config/containers/ansible-kubernetes.d/prometheus.y
 ```
 
 Lightspeed使用的大語言模型是建置在Red Hat的內部環境裏。為此，lightspeed工具所在的主機，<u>必先向Red Hat網路註冊</u>。
+
 只有註冊過的主機，才能將查詢送到Red Hat的環境裏的LLM做進一步處理，並回傳結果給我們。
+
 我們可以利用下列指令看到註冊現況：(您看到的資料，會與下面的範例不同)
 
 ```pseudocode
@@ -78,10 +79,10 @@ org name: 6265347
 org ID: 6265347
 ```
 
-此外，您若要做同樣的測試，需在RHEL 9.6+ or RHEL 10的主機上，才能享有此功能。
+此外，您若要在公司做同樣的測試，需在RHEL 9.6+ or RHEL 10的主機上，才能享有此功能。
 
    > [!tip]
-   > 您得(a) 先安裝 command-line-assistant套件，並且要(b)確保RHEL已向Satellite ver 6.17+ 或Red Hat雲端註冊，才能運作成功。
+   > 您得(a) 先安裝 command-line-assistant套件，並且要(b)確保RHEL已向Satellite ver 6.17+ 或Red Hat雲端註冊，才能使用Lightspeed。
 
 ## 本日lab總覽
 
@@ -91,8 +92,8 @@ org ID: 6265347
 | ------- | ------------------------------------ | -------------------------------------------------------- | -------------- |
 | １      | 建置Event-driven的環境               | 是，沒有做整個demo並不完整                               | 20             |
 | ２      | 測試Event-Driven Ansible             | 是，驗證前面的demo                                       | 5              |
-| ３      | 對監控系統加一個新的事故關鍵字       | 否，若日後想建置相似的環境時，會用到此段內容             | 15             |
-| ４      | 在Ansible Workflow加一個通知         | 否，若日後想建置相似的環境時，會用到此段內容             | 10             |
+| ３      | 對監控系統加一個新的事故關鍵字       | 否，但日後想建置相似的環境時，會用到此段內容             | 15             |
+| ４      | 在Ansible Workflow加一個通知         | 否，但日後想建置相似的環境時，會用到此段內容             | 10             |
 | ５      | 看完信後，以AI工具進行調查           | 否，但滿實用，而且也應該是未來的工作主流                 | 5              |
 | 6       | 以AI工具對Ansible Controller進行操作 | 否，但很建議試做，因為這樣的組合目前在網際網路上還很少見 | 5              |
 
@@ -109,6 +110,32 @@ org ID: 6265347
 但這個同事今天臨時請假沒來，老闆要您幫忙完成這個rulebook的設定作業。
 
 所以讓我們開始動工吧!
+
+### 檢視Rulebook的內容
+
+Ansible Rulebook就像Ansible Playbook一樣，是個yaml檔案。但它和playbook不一樣的地方，是它規範了會監聽的事件來源，以及收到來源後得符合什麼條件才能往下執行，而執行時要執行什麼工作。
+
+接下來解說Rulebook的內容：
+
+1. 請使用您筆電的瀏覽器，登入Git Server的圖形化界面。
+2. 登入Git Server (本例為Gitea服務)，**<u>使用dev-admin帳號</u>**，及我們workshop的萬用密碼。
+3. 在畫面右手邊，會有Repositories的清單。請點選dev-admin/pf_rulebook
+4. 再畫面左手邊，再點選rulebooks目錄。
+   這是必要的資料夾設計。如果您的rulebooks不放在這裏，AAP環境就會有存取的問題。
+5. 在rulebooks目錄下只有一個唯一的webhook-prometheus.yml。請點開它的鏈結閱讀其內容。
+
+<img src="/home/pat/Dropbox/knowhow/student_guide/eda0.png" style="zoom:50%;" />
+
+觀察的重點為：
+
+1. 連線的主機名稱：如同Ansible playbook一樣，我們會選定一個要連線後自動化的對象。但在EDA的GUI環境下，這個參數會被忽略。會在GUI環境由別其他設定代替。
+2. 監聽對象：我們使用了最通用的webhook，監聽TCP port 5000。EDA還有近二十種監聽來源可供選擇。
+3. 過濾條件：不是所有的事件我們都會有所反應。這裏界定了如果送來的事件中，其中payload的資料欄位裏，有一個alerts[0].status的內容為firing才會將事件往下送，交由「actions」段落的三個工作來應對。
+4. 動作一：print_event其實是一個debug的工作，把送進來的event的內容整個傾印，非必要。
+5. 動作二：更精細的debug，我們故意要印出送來的事件中某特定的資料。將來會交給Ansible Controller對特定主機搜集資訊，並且對特定主題做初步研究。
+6. 動作三：這是這個rulebook有實質意義的行為，它會執行一個Ansible Controller裏的一個Workflow Template，名稱是"collect-evidence-and-let-ai-analyze"。它同時會傳遞二個變數給Ansible Controller，一個是報警的主機名稱，另一個是事故的關鍵字。
+
+了解了EDA rulebook的內容後，接下來我們會要它在EDA環境7x24的日夜執行，以等待事件的發生。
 
 ### 檢查Event-Driven Ansible目前現況
 
@@ -137,8 +164,9 @@ org ID: 6265347
    觀察C：繼續前述類似的操作：
    有個"infrastructure"(1), "Credentials"(2)的項目在左手邊。
 
-   記錄了EDA要連向Git Server所需的帳號密碼(3)，以及連向Ansible Controller所需的帳號密碼(4)。
-<img src="eda2.png" alt="image-20250902174819522" style="zoom: 50%;" />
+   記錄了EDA要連向Git Server所需的帳號密碼(3)，以及連向Ansible Controller所需的帳號密碼(4)。這裏也同時設定了EDA要連向那一個Ansible Controller對其發號施令。
+
+   <img src="eda2.png" alt="image-20250902174819522" style="zoom: 50%;" />
 
 ### 啟動一個Rulebook
 
@@ -147,7 +175,7 @@ org ID: 6265347
 
 請填入或檢視下列六個設定：
 
-1) rulebook名稱：請一定、一定、一定要填這個名字，platform-eda。
+1) rulebook名稱：請一定、一定、一定要填這個名字，**platform-eda**。
    因為在Ansible on OCP環境，我們稍後要開設一個route物件，把這個rulebook產生的service物件對外公開。我們會提供一個yaml file建置這個route物件，而這個yaml檔案我們已經寫死了platform-eda這名字，為此請一定要填這個名字。
 
    在您公司裏的環境，就可以和OCP管理員討論這方面的設定。若是您的AAP建置在RHEL環境，則取什麼rulebook名字就沒那麼重要，方便識別即可。
@@ -176,8 +204,9 @@ org ID: 6265347
 
 1. 切入觀察rulebook運作的地方
 2. 我們剛剛建置的rulebook 'platform-eda'。這裏EDA controller會持續監控所有運行中的rulebook，連我們剛建好的總共有四個事件來源。
+   ( 不過我們這個workshop只關心platfom-eda這個來源:p )
 3. 狀態顯示為"Running"。若沒有問題，它會7x24持續監控著事件來源。
-4. 在rulebook裏有效的rule數量。
+4. 在rulebook裏有生效的rule數量。
 
 ### 在AAP on OCP環境建置一個route物件
 
@@ -362,7 +391,7 @@ named[1514]: exiting (due to assertion failure)
 
 > [!tip]
 >
-> 或許這個例字用'due to assertion failure'也很有識別性。但用'failed, back trace'中間有逗號，也是驗證mtail抓關鍵字的能力。
+> 或許這個例子用'due to assertion failure'也很有識別性。但用'failed, back trace'關鍵字，中間竟然有逗號，也是驗證mtail抓關鍵字的能力。
 
 ### 步驟一：修改mtail的監鍵字清單
 
@@ -439,16 +468,16 @@ case "$choice" in
 esac
 ```
 
-做完二備改動，存檔後離開。
+做完二個改動後，存檔後離開。
 
 ### 步驟三：變更Ansible Playbook，加強對新事件的說明
 
 在每一次事件發生後，我們會發送二封email
 
-- 一封記錄著事發當下幾分鐘後的效能數據，這與此次的練習無關。
+- 一封記錄著事發當下幾分鐘後的效能數據，這次和lab 3沒有影響。
 - 另一封記錄著log的AI分析，還有人類的分析。
 
-我們要更動「人類的分析」這一塊，讓下次同仁收到告警的mail時，可以看到AI及同仁加註的經驗談。
+我們要更動「人類的分析」這一塊，讓下次同仁收到告警的mail時，可以看到AI及「同仁加註的經驗談」。
 
 首先我們要把playbook同步到bastion主機-請注意下面範例的git server的名稱要更改：
 
@@ -459,7 +488,7 @@ esac
 
 前面的動作會下載一個pf_playbook的資料夾到地端；我們要編輯的是「ask-light-speed-review-logs.yml」。
 
-請往下捲動內容到66行的位置，複製"no majority"的task，共四行(66-69行)，再貼到它下面一點的位置，約71行開始的位置(71-75)。再編輯該task後，成果應如下所示：
+請往下捲動內容到66行的位置，複製"no majority"的task，共四行(66-69行)，再貼到它下面一點的位置，約71行開始的位置(71-75)。再修改複製好的內容，加上我們希望提醒未來同仁該如何應對的字句…成果應如下所示：
 
 ```pseudocode
  66     - name: Add Additional suggestion from Technical Account Manager for keyword "incident_keyword"
@@ -480,9 +509,9 @@ esac
 
 > [!tip]
 >
-> 左方的數字是行數。是在vim編輯器裏，使用: set number方式顯現，請勿輸入playbook裏面。
+> 左方的數字是行數。是在vim編輯器裏，使用: set number方式顯現，請勿把行號輸入playbook裏面。
 
-讓playbook被執行前，對playbook的語法檢查永遠是個好習慣。
+playbook被執行前，對playbook的語法檢查永遠是個好習慣。
 
 ```pseudocode
 [lab-user@bastion tamday]$ ansible-playbook --syntax-check pf_playbook/ask-light-speed-review-logs.yml
@@ -594,7 +623,7 @@ To https://gitea.apps.cluster-p8fxl.p8fxl.sandbox5183.opentlc.com/dev-admin/pf_p
 4. 選定Inventory。在這個workshop您得選"bastion"。
 5. 選定playbook存放的來源。在這個workshop您得選"local gitea"。
 6. 選定playbook：我們已經幫您準備好了，這個會以LINE API的方式傳送事故資料的playbook叫做「notifyLine.yml」。
-   它已在事前同步在Git server，並拉取/同步至Ansible Controller了。
+   它已在事前同步在Git server，並同步至Ansible Controller了。
 7. 選定Credential：由於notifyLine.yml裏面會使用LINE API的token，而這項機密資料是放在Git server的pf_playbook子目錄下的secret.yml加密檔案，在notifyLine.yml執行時會讀取。
    讀取時要解密secret.yml，因此我們要提供一個credential物件，型式是"Vault"，裏面內藏著能解開secret.yml的密碼。
 8. 啟用Prompt on launch
@@ -801,7 +830,7 @@ Using: 1 MCP server (ctrl+t to view)
 利用這種對話的方式，您可以在Gemini-cli進行如下的發問：
 
 ```pseudocode
-請幫我執行Job Template 並分析執行結果
+請幫我執行Job Template "Perform a ansible ping" 並分析執行結果
 ```
 
 這會讓使用Ansible Controller的難度降低許多。紅帽目前也在和社群合作，強化Ansible Lightspeed的功能。預期以後能以對話的方式，直接在Ansible Controller裏面讓AI幫我建置Job Template或調整Controller設定。
@@ -816,8 +845,10 @@ Using: 1 MCP server (ctrl+t to view)
 
 ## 結語
 
-Platform Workshop到此結束，希望協助大家將AI與EDA整合到自己的環境。
+Platform Workshop到此結束。
+
+由於時間的限制，您可能無法充份的測試每個想體驗的功能。不過我們的TAM同仁都會在未來和大家討論今天交流的細節，最終希望協助大家將AI與EDA整合到自己的環境。
 
 本日的簡報，以及相關的設定檔與playbook範例，會在會後分享給出席的貴賓。
 
-但其中設計的心法，遇到的限制與問題，則請貴賓與您對應的TAM連絡，由他們再專門為各位解說。
+如果您看完後，對其中設計的心法，還有我們設計workshop時遇到的限制與問題，則請您連絡對應的TAM，由他們再專門為各位詳細解說。
