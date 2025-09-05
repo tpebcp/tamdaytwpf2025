@@ -484,11 +484,13 @@ esac
 
 我們要更動「人類的分析」這一塊，讓下次同仁收到告警的mail時，可以看到AI及「同仁加註的經驗談」。
 
-首先我們要把playbook同步到bastion主機-<span style=color:red><u>請注意下面範例的git server的名稱要更改</u>：</span>
+首先我們要把playbook同步到bastion主機-<<<**請注意下面範例的git server的名稱要更改**>>>：
 
 ```pseudocode
 [lab-user@bastion ~]$ cd tamday/
-[lab-user@bastion tamday]$ git clone https://gitea.apps.cluster-p8fxl.p8fxl.sandbox5183.opentlc.com/dev-admin/pf_playbook
+[lab-user@bastion tamday]$ git clone https://gitea.apps.cluster-p8fxl.p8fxl.sandbox5183.opentlc.com/dev-admin/pf_playbook.git
+Cloning into 'pf_playbook'...
+(略)
 ```
 
 前面的動作會下載一個pf_playbook的資料夾到地端；我們要編輯的是「ask-light-speed-review-logs.yml」。
@@ -528,11 +530,12 @@ playbook: pf_playbook/ask-light-speed-review-logs.yml
 
 在切換到pf_playbook這個有執行過git的子資料夾下，我們將要執行的指令有三個
 
-1. git add ask-light-speed-review-logs.yml 通知git指令我們要上傳變動的檔案名稱
-2. git commit -m 'xxx' xxx是檔案變更的理由
-   此時您會看到git聲稱我們之前沒有做username and hostname的設定；但我們可以接受它的預設值。
-3. git push 將變更推回git server
-   此時要輸入dev-admin這個git server的帳號與密碼。
+1. git add ask-light-speed-review-logs.yml 
+   通知git指令我們要上傳變動的檔案名稱
+2. git commit -m 'xxx' 
+   xxx是檔案變更的理由。此時您會看到git聲稱我們之前沒有做username and hostname的設定；但我們可以接受它的預設值。
+3. git push 
+   將變更推回git server。此時要輸入dev-admin這個git server的帳號與密碼。
 
 全部的操作如下：
 
@@ -562,6 +565,15 @@ Password for 'https://dev-admin@gitea.apps.cluster-p8fxl.p8fxl.sandbox5183.opent
 (略)
 To https://gitea.apps.cluster-p8fxl.p8fxl.sandbox5183.opentlc.com/dev-admin/pf_playbook
    8cef593..fda9e13  main -> main
+```
+
+您可以補執行`git status`指令，確認所有檔案都上傳成功，"your branch is up to date"。
+```pseudocode
+[lab-user@bastion pf_playbook]$ git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
 ```
 
 ### 步驟四：進行測試
