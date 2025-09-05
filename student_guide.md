@@ -128,7 +128,7 @@ Ansible Rulebook就像Ansible Playbook一樣，是個yaml檔案。但它和playb
    這是必要的資料夾設計。如果您的rulebooks不放在這裏，AAP環境就會有存取的問題。
 5. 在rulebooks目錄下只有一個唯一的webhook-prometheus.yml。請點開它的鏈結閱讀其內容。
 
-<img src="/home/pat/Dropbox/knowhow/student_guide/eda0.png" style="zoom:50%;" />
+<img src="eda0.png" style="zoom:50%;" />
 
 觀察的重點為：
 
